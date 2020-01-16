@@ -1,0 +1,198 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_arith.ALL;
+USE ieee.std_logic_unsigned.ALL;
+
+ENTITY insertcore IS
+   GENERIC(RSTDEF: std_logic := '1');
+   PORT(rst:   IN  std_logic;  -- reset, RSTDEF active
+        clk:   IN  std_logic;  -- clock, rising edge active
+
+        -- handshake signals
+        strt:  IN  std_logic;  -- start bit, high active
+        done:  OUT std_logic;  -- done bit, high active
+        ptr:   IN  std_logic_vector(10 DOWNTO 0); -- pointer to vector
+        len:   IN  std_logic_vector( 7 DOWNTO 0); -- length of vector
+
+        WEB:   OUT std_logic; -- Port B Write Enable Output, high active
+        ENB:   OUT std_logic; -- Port B RAM Enable, high active
+        ADR:   OUT std_logic_vector(10 DOWNTO 0);  -- Port B 11-bit Address Output
+        DIB:   IN  std_logic_vector( 7 DOWNTO 0);  -- Port B 8-bit Data Input
+        DOB:   OUT std_logic_vector( 7 DOWNTO 0)); -- Port B 8-bit Data Output
+END insertcore;
+
+
+ARCHITECTURE verhalten OF insertcore IS
+
+	TYPE TState IS(S0, S1, S2, S3, S4);
+	SIGNAL state, state0: TState;
+	SIGNAL d, d0: std_logic;   -- done-Signal
+	SIGNAL i, i0, i1, iM1: std_logic_vector(7 DOWNTO 0); --i1 weggelassen!!!   -- 7 downto 0 STATT 8 downto 1
+	SIGNAL j, j0, j1, jM1: std_logic_vector(7 DOWNTO 0);
+	SIGNAL key, key0: std_logic_vector(7 DOWNTO 0);
+	SIGNAL ofs: std_logic_vector(7 DOWNTO 0);
+	
+--BEGIN 
+--	PROCESS
+--    CONSTANT N: natural := 20;
+--	VARIABLE test_n: natural:= 20;
+--    TYPE string IS array(natural RANGE <>) OF character;
+--    CONSTANT g: string(0 TO N-1) := "1449BEKMMPQTZceffrvz";
+--   VARIABLE a: string(0 TO N-1) := "P91fQeZB4KvTMcrEfzM4";
+--   VARIABLE b: string(0 TO N-1) := "1449BEKMMPQTZceffrvz";
+--   VARIABLE c: string(0 TO N-1) := "zvrffecZTQPMMKEB9441";
+
+--PROCEDURE sort(a: INOUT string; n: positive) IS
+--	TYPE TState IS(S0, S1, S2, S3, S4, S5);
+--	VARIABLE key: character;
+--	VARIABLE j: integer;
+--	VARIABLE i: natural RANGE 1 TO n;
+--	VARIABLE a_j: character;
+--	VARIABLE state: TState := S0;
+	
+--BEGIN
+--	LOOP
+--		CASE state IS
+--			WHEN S0=>
+--				i := 1;
+--				state := S1;
+--			WHEN S1=>
+--				IF i <= n-1 THEN					
+--					state := S2;
+--				ELSE 
+--					RETURN;
+--				END IF;
+--			WHEN S2=>
+--				key := a(i);
+--				j := i-1;
+--				state := S3;				
+--			WHEN S3=>
+--				IF j >= 0 THEN
+--					a_j := a(j);
+--					state := S5;								
+--				ELSE
+--					state := S4;
+--				END IF;
+--			WHEN S4=>
+--				a(j+1) := key;				
+--				i := i + 1;
+--				state := S1;
+--			WHEN S5=>
+--				IF a_j <= key THEN
+--					state := S4;
+--				ELSE
+--					a(j+1) := a_j;
+--					j := j - 1;
+--					state := S3;
+--				END IF;		
+--		END CASE;
+--	END LOOP;
+--END PROCEDURE;
+
+BEGIN
+	
+	done <= d;
+	ADR  <= ptr + ofs;
+	i1   <= i + 1; --Hilfszähler
+	iM1  <= i - 1;
+	j1   <= j + 1;
+	jM1  <= j - 1;
+	
+	reg: PROCESS (rst, clk) IS
+    BEGIN
+      IF rst=RSTDEF THEN
+         state <= S0;
+         i     <= (OTHERS => '0');
+         j     <= (OTHERS => '0');
+         key   <= (OTHERS => '0');
+         d     <= '0';
+
+      ELSIF rising_edge(clk) THEN
+         state <= state0;
+         i     <= i0;
+         j     <= j0;
+         key   <= key0;
+         d     <= d0;
+
+      END IF;
+    END PROCESS;
+   
+    fsm: PROCESS(state, strt, len, i, i1, j, j1, jM1, iM1, d, key, dib) IS
+    BEGIN
+		state0 <= state;
+		i0 <= i;
+		j0 <= j;
+		key0 <= key;
+		d0 <= d;
+
+		ofs    <= i;     -- default (OTHERS => '0');
+		WEB    <= '0';
+        ENB    <= '1';
+		DOB    <= key; -- default (OTHERS => '0');
+		
+		CASE state IS
+			WHEN S0 =>
+				IF strt='1' THEN
+					d0 <= '0';
+					i0 <= "00000001";
+					state0 <= S1;
+					-- j0 <= (OTHERS => '0');
+				END IF;
+				
+			WHEN S1 =>
+				IF i < len THEN	-- Zuweisung an die Adresse fehlt		
+					j0 <= iM1;
+					state0 <= S2;					
+				ELSE 
+					d0 <= '1';
+					state0 <= S0;
+				END IF;				
+				
+			WHEN S2 =>
+					key0 <= DIB;
+					ofs <= j;
+					state0 <= S3;
+			
+			WHEN S3 =>
+				IF DIB <= key THEN
+					ofs <= j1;				
+					WEB <= '1';
+					DOB <= key;
+					i0 <= i1;
+					state0 <= S1;
+				ELSE
+					ofs <= j1;
+					WEB <= '1';
+					DOB <= DIB; -- offset muss gesetzt sein
+					j0 <= jM1;
+					
+					state0 <= S4;
+				END IF;
+			
+			WHEN S4 =>
+				IF j = "11111111" THEN				
+					ofs <= j1;				
+					WEB <= '1';
+					DOB <= key;
+					i0 <= i1;
+					state0 <= S1;				
+				ELSE
+					ofs <= j; 
+					state0 <= S3;
+				END IF;	
+		
+		END CASE;
+--	END PROCESS;
+	
+	
+    --sort(a, test_n);
+    --ASSERT a=g SEVERITY error;
+    --sort(b, test_n);
+    --ASSERT b=g SEVERITY error;
+    --sort(c, test_n);
+    --ASSERT c=g SEVERITY error;
+    --WAIT;
+END PROCESS;
+	
+	
+END verhalten;

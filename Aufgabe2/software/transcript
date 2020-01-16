@@ -1,0 +1,49 @@
+# Reading C:/Microsemi/Libero_SoC_v11.9/Modelsim/tcl/vsim/pref.tcl
+# OpenFile C:/Users/user/HSCD/Aufgabe2/software/PROGRAMM.VHD
+vcom -reportprogress 300 -work work C:/Users/user/HSCD/Aufgabe2/software/PROGRAMM.VHD
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 13:39:35 on Nov 27,2019
+# vcom -reportprogress 300 -work work C:/Users/user/HSCD/Aufgabe2/software/PROGRAMM.VHD 
+# ** Error: (vcom-66) Execution of vlib.exe failed. Please check the error log for more details.
+# End time: 13:39:36 on Nov 27,2019, Elapsed time: 0:00:01
+# Errors: 1, Warnings: 0
+vlib work
+vcom -reportprogress 300 -work work C:/Users/user/HSCD/FDSx2.vhd
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 13:39:50 on Nov 27,2019
+# vcom -reportprogress 300 -work work C:/Users/user/HSCD/FDSx2.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Compiling entity FDSx2
+# -- Loading package VCOMPONENTS
+# -- Compiling architecture structure of FDSx2
+# End time: 13:39:59 on Nov 27,2019, Elapsed time: 0:00:09
+# Errors: 0, Warnings: 0
+vcom -reportprogress 300 -work work C:/Users/user/HSCD/kcpsm3.vhd
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 13:39:59 on Nov 27,2019
+# vcom -reportprogress 300 -work work C:/Users/user/HSCD/kcpsm3.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package VCOMPONENTS
+# -- Compiling entity kcpsm3
+# -- Compiling architecture low_level_definition of kcpsm3
+# End time: 13:40:00 on Nov 27,2019, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+vcom -reportprogress 30 -work work C:/Users/user/HSCD/timer.vhd
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 13:40:00 on Nov 27,2019
+# vcom -reportprogress 30 -work work C:/Users/user/HSCD/timer.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling entity timer
+# -- Compiling architecture behaviour of timer
+# End time: 13:40:01 on Nov 27,2019, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0

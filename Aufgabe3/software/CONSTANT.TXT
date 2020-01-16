@@ -1,0 +1,19 @@
+Table of constant values and their specified constant labels.
+
+00  IO_Port
+01  LED0
+02  LED1
+04  BNT0
+01  COM_Port
+01  TXD
+01  RXD
+10  SIXTEEN
+08  EIGHT
+04  RAM_DATA
+02  RAM_REG1
+03  RAM_REG2
+08  CTRL
+09  PTR1
+0A  PTR2
+0B  LEN
+FF  BLOCKSIZE

@@ -1,0 +1,313 @@
+
+        CONSTANT IO_Port,  00
+        CONSTANT LED0,     01
+        CONSTANT LED1,     02
+        CONSTANT BNT0,     04
+        
+        CONSTANT COM_Port, 01
+        CONSTANT TXD,      01
+        CONSTANT RXD,      01
+			
+		CONSTANT SIXTEEN,	 10
+		CONSTANT EIGHT,		 08		
+		CONSTANT RAM_DATA,   04
+		CONSTANT RAM_REG1,   02
+		CONSTANT RAM_REG2,   03
+		
+		CONSTANT CTRL,       08		; done und start
+		CONSTANT PTR1,       09     ; Bits 1 - 8
+		CONSTANT PTR2,       0A		; Bits 9 - 11
+		CONSTANT LEN,        0B
+		CONSTANT BLOCKSIZE,  FF
+
+; Register Mapping
+; alle acht Register s0 bis s7 stehen der ISR zur Verfuegung
+        NAMEREG s0, IOR
+        NAMEREG s1, TMP
+        NAMEREG s2, CNTH
+        NAMEREG s3, CNTL
+		NAMEREG s4, RAMADDR_READ
+		NAMEREG	s5, CORRECT_COUNTER
+		NAMEREG s7, BLOCK_CNT
+		NAMEREG	s6, SORT_REG 
+		 
+		
+; alle acht Register s8 bis sF stehen der Main-Funktion zur Verfuegung
+
+		NAMEREG s8, CNT16
+		NAMEREG s9, CNT8
+		NAMEREG sA, DATA
+		NAMEREG sB, READ_REG
+		NAMEREG sC, STATEWRITE
+		NAMEREG sD, STATEREAD
+		NAMEREG sE, READY_TO_WRITE
+		NAMEREG sF, CNTR16
+				
+; --------------------------------------------------------------------------------------------
+
+        ADDRESS 000
+; Hauptfunktion
+start:  AND    CNTH, 00       ; Initialisierung der Zaehlers ...
+        AND    CNTL, 00       ; in der ISR
+		LOAD   STATEWRITE, 00 ; Setzt Zustand auf 0
+		LOAD   RAMADDR_READ, 00
+		OUTPUT RAMADDR_READ, RAM_REG2
+		LOAD   READY_TO_WRITE, 01 ; Write-Erlaubnis sperren
+		LOAD   CNT16, SIXTEEN	; Taktzähler auf 16 setzen
+		LOAD   CNT8, EIGHT		; Bitzähler auf 8 setzen
+		LOAD   CNTR16, SIXTEEN	; Taktzähler auf 16 setzen
+		LOAD   CORRECT_COUNTER, 00
+		LOAD   BLOCK_CNT, BLOCKSIZE	;Blockzähler mit 16 initialisieren 
+		OUTPUT RAMADDR_READ, PTR1
+		OUTPUT RAMADDR_READ, PTR2
+		LOAD   SORT_REG, 00
+		OUTPUT SORT_REG, CTRL
+        ENABLE INTERRUPT
+loop:   ; do nothing
+        JUMP loop
+
+; --------------------------------------------------------------------------------------------
+ 
+; Subroutine, die den Zustand des Buttons BTN0 auf die Leuchtdiode LED0 durchschaltet
+BNT0LED0:
+        INPUT  IOR,  IO_Port ; IO-Port einlesen
+        INPUT  TMP,  IO_Port ; IO-Port einlesen
+        AND    TMP,  BNT0    ; Zustand von BNT0 ermitteln
+        SR0    TMP           ; auf die Position ...
+        SR0    TMP           ; ... von LED0 verschieben
+        AND    IOR,  LED1    ; Zustand von LED1 ermitteln
+        OR     IOR,  TMP     ; LED1 mit BNT0 konkatinieren
+        OUTPUT IOR,  IO_Port ; den neuen Wert ueber IO-Port ausgeben 
+        RETURN
+
+; --------------------------------------------------------------------------------------------
+
+; Subroutine, die die Leuchtdione LED1 mit ca. 1 Hz blinken laesst
+BLINK:  ADD    CNTL, 01      ; den 16-Bit-Zaehler ... 
+        ADDCY  CNTH, 00      ; .. inkrementieren
+        JUMP   NC,   BLINK0  ; kein Ueberlauf -> exit, sonst
+        INPUT  IOR,  IO_Port ; IO-Port einlesen
+        XOR    IOR,  LED1    ; LED1 toggeln
+        OUTPUT IOR,  IO_Port ; den neuen Wert ueber IO-Port ausgeben 
+BLINK0: RETURN	
+	
+; --------------------------------------------------------------------------------------------
+
+; Subroutine, die Daten in das Ausgangsportal TXD schreibt	
+WRITE:	
+		COMPARE	READY_TO_WRITE, 00
+		RETURN  NZ
+		COMPARE CORRECT_COUNTER, 00
+		JUMP Z, RESET_RAM
+		COMPARE STATEWRITE, 00
+		JUMP Z, WRITE_STARTBIT
+		COMPARE STATEWRITE, 01
+		JUMP Z, WRITE_DATA
+		COMPARE STATEWRITE, 02
+		JUMP Z, WRITE_STOPBIT
+		JUMP WRITE_IDLE
+
+; --------------------------------------------------------------------------------------------
+
+RESET_RAM:
+		LOAD BLOCK_CNT, BLOCKSIZE
+		LOAD CORRECT_COUNTER, 00
+		LOAD RAMADDR_READ, 00
+		LOAD READY_TO_WRITE, 01
+		RETURN
+
+; --------------------------------------------------------------------------------------------
+
+WRITE_STARTBIT:
+		SUB    CNT16, 01		
+		RETURN NZ	
+		LOAD   CNT16, SIXTEEN	;Zaehler zurücksetzen	        ; 16 Takte abwarten
+		OUTPUT  RAMADDR_READ, RAM_REG1 
+		INPUT   DATA, RAM_DATA
+		AND     IOR, 00
+		OUTPUT  IOR, COM_Port
+		LOAD 	STATEWRITE, 01
+		RETURN
+; --------------------------------------------------------------------------------------------
+WRITE_DATA:		
+		SUB    CNT16, 01		
+		RETURN NZ
+		LOAD   CNT16, SIXTEEN	;Zaehler zurücksetzen	        ; 16 Takte abwarten
+		OUTPUT DATA, COM_Port	; Datenregister auf Output setzen		
+		SR0    DATA		
+		SUB    CNT8, 01		; Daten bitweise herausschreiben			
+		RETURN NZ
+		LOAD   CNT8, EIGHT	    ; Zaehler zurücksetzen
+		LOAD   STATEWRITE, 02
+		RETURN
+; --------------------------------------------------------------------------------------------
+WRITE_STOPBIT:
+		SUB     CNT16, 01
+		RETURN  NZ
+		LOAD    CNT16, SIXTEEN	;Zaehler zurücksetzen
+		LOAD    IOR, 01
+		OUTPUT  IOR, COM_Port
+		ADD 	RAMADDR_READ, 01	
+		LOAD	STATEWRITE, 03		
+		SUB		CORRECT_COUNTER, 01
+		RETURN NZ
+		LOAD    RAMADDR_READ, 00
+		LOAD	CORRECT_COUNTER, 00
+		LOAD    READY_TO_WRITE, 01  ;Schreibsperre aktivieren
+        RETURN
+	
+; --------------------------------------------------------------------------------------------	
+WRITE_IDLE:
+		LOAD 	STATEWRITE, 00
+		RETURN
+		
+; --------------------------------------------------------------------------------------------
+
+READ:
+		COMPARE STATEREAD, 00
+		JUMP Z, READ_STARTBIT
+		COMPARE STATEREAD, 01
+		JUMP Z, READ_DATA
+		COMPARE STATEREAD, 02
+		JUMP	Z, READ_STOPBIT
+		COMPARE STATEREAD, 03
+		JUMP	Z, WAIT_SORT
+		JUMP    READ_IDLE
+		
+		
+; --------------------------------------------------------------------------------------------
+
+READ_DATA:
+		SUB    CNTR16, 01		
+		RETURN NZ
+		LOAD CNTR16, SIXTEEN
+		INPUT   IOR, COM_Port
+		OR READ_REG,IOR
+		RR	READ_REG				; Inhalt des Read-Registers nach links verschieben
+		SUB    CNT8, 01		; Daten bitweise herausschreiben			
+		RETURN NZ
+		LOAD   CNT8, EIGHT	    ; Zaehler zurücksetzen		
+		LOAD   STATEREAD, 02
+		; change state	
+		RETURN			
+
+; --------------------------------------------------------------------------------------------
+
+
+CHECK_GROSS:
+	COMPARE READ_REG, 5B	; ist es größer als 5A?
+	JUMP NC, READ_INCORRECT
+	COMPARE READ_REG, 41	; ist es kleiner als 41?
+	JUMP C, CHECK_ZAHL
+	JUMP READ_CORRECT	
+	
+; --------------------------------------------------------------------------------------------
+
+CHECK_ZAHL:
+	COMPARE READ_REG, 3A	; ist es größer als 39
+	JUMP NC, READ_INCORRECT
+	JUMP READ_CORRECT	
+
+; --------------------------------------------------------------------------------------------
+
+READ_STARTBIT:
+		INPUT   IOR, COM_Port
+		COMPARE IOR, 00
+		RETURN  NZ		
+		SUB 	CNT8, 01
+		RETURN NZ
+		LOAD    CNT8, EIGHT
+		LOAD 	STATEREAD, 01
+		RETURN
+		
+; --------------------------------------------------------------------------------------------
+READ_STOPBIT:
+		SUB     CNTR16, 01
+		RETURN  NZ
+		LOAD    CNTR16, SIXTEEN	;Zaehler zurücksetzen
+		INPUT   IOR, COM_Port
+		COMPARE IOR, 01
+		RETURN  NZ
+		
+		; Bereich einschränken
+		COMPARE READ_REG, 30	;ist es kleiner als #30?
+		JUMP C, READ_INCORRECT  
+		COMPARE READ_REG, 7B	;ist es größer als #7A?
+		JUMP NC, READ_INCORRECT
+		; Kleinbuchstabe
+		COMPARE READ_REG, 61
+		JUMP C, CHECK_GROSS
+		JUMP READ_CORRECT
+	
+		
+        
+		
+; --------------------------------------------------------------------------------------------	
+READ_IDLE:
+		LOAD   	CNT8, EIGHT	    ; Zaehler zurücksetzen
+		LOAD   	CNTR16, SIXTEEN	;Zaehler zurücksetzen
+		AND 	STATEREAD, 00
+		AND		READ_REG, 00
+		RETURN
+		
+; --------------------------------------------------------------------------------------------
+		
+READ_CORRECT:
+		LOAD	STATEREAD, 04	
+		ADD		CORRECT_COUNTER, 01
+		OUTPUT  RAMADDR_READ, RAM_REG1 
+		OUTPUT  READ_REG, RAM_DATA
+		ADD	    RAMADDR_READ, 01
+		SUB		BLOCK_CNT, 01
+		RETURN NZ
+		LOAD 	RAMADDR_READ , 00
+		LOAD    BLOCK_CNT, BLOCKSIZE
+		OUTPUT 	CORRECT_COUNTER, LEN
+		LOAD	SORT_REG, 01
+		OUTPUT	SORT_REG, CTRL
+		LOAD    STATEREAD, 03
+		RETURN
+		
+; --------------------------------------------------------------------------------------------
+
+READ_INCORRECT:
+		LOAD   	CNT8, EIGHT	    ; Zaehler zurücksetzen
+		LOAD   	CNTR16, SIXTEEN	;Zaehler zurücksetzen
+		AND 	STATEREAD, 00
+		AND		READ_REG, 00
+		SUB		BLOCK_CNT, 01
+		RETURN NZ
+		LOAD 	RAMADDR_READ , 00
+		LOAD    BLOCK_CNT, BLOCKSIZE
+		OUTPUT 	CORRECT_COUNTER, LEN
+		LOAD	SORT_REG, 01
+		OUTPUT	SORT_REG, CTRL
+		LOAD    STATEREAD, 03		
+		RETURN
+		
+; --------------------------------------------------------------------------------------------
+WAIT_SORT:
+	LOAD	SORT_REG, 00
+	OUTPUT	SORT_REG, CTRL
+	INPUT   SORT_REG, CTRL
+	COMPARE	SORT_REG, 01
+	RETURN NZ
+	AND    	READY_TO_WRITE, 00  ;Schreibsperre aufheben
+	LOAD    STATEREAD, 04
+	RETURN
+; --------------------------------------------------------------------------------------------
+        
+        ADDRESS 300
+; Interrupt-Service-Routine
+ISR:    CALL   WRITE
+		CALL   READ
+		CALL    BNT0LED0
+        CALL    BLINK      		
+		
+        RETURNI ENABLE
+
+; --------------------------------------------------------------------------------------------
+
+; Interrupt-Vektor
+        ADDRESS 3FF
+        JUMP ISR

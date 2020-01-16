@@ -1,0 +1,46 @@
+	PROCEDURE sort(VARIABLE a: INOUT string; VARIABLE n: positive) IS
+	
+		TYPE TState IS(S0, S1, S2, S3);
+		VARIABLE state: TState := S0;
+		VARIABLE i: natural range 0 to n-1;
+		VARIABLE j: integer;
+		VARIABLE key: character;
+		VARIABLE helper1: character;
+	
+		BEGIN
+			LOOP		
+				CASE state IS 			-- Initialisierung
+					WHEN S0 =>
+						i     := 1;
+						state := S1;
+			
+					WHEN S1 =>			-- Ausführung
+						IF i <= n - 1 THEN
+							key := a(i);
+							j := i-1;
+							state := S2;
+						ELSE
+							RETURN;
+						END IF;
+			
+					WHEN S2 =>			-- innere Schleife
+						IF j >= 0 THEN
+							helper1 := a(j);
+							state	:= S3;
+						ELSE
+							a(j+1) := key;
+							i := i + 1;
+							state := S1;
+						END IF;
+						
+					WHEN S3 =>
+						IF helper1 <= key THEN
+								EXIT;
+						END IF;
+						a(j+1) := helper1;
+						j := j - 1;
+						state := S2;
+						
+				END CASE;		
+			END LOOP;
+		END PROCEDURE;

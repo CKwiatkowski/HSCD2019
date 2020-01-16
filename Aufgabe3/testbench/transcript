@@ -1,0 +1,128 @@
+# Reading C:/Microsemi/Libero_SoC_v11.9/Modelsim/tcl/vsim/pref.tcl
+# OpenFile C:/Users/user/HSCD/Aufgabe3/testbench/insertcore_tb.vhd
+vsim work.insertcore_tb
+# vsim work.insertcore_tb 
+# Start time: 08:07:36 on Jan 16,2020
+# //  ModelSim Microsemi 10.5c Jul 21 2016
+# //
+# //  Copyright 1991-2016 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  ModelSim Microsemi and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.std_logic_arith(body)
+# Loading ieee.std_logic_unsigned(body)
+# Loading work.insertcore_tb(verhalten)
+# Loading work.insertcore(verhalten)
+vcom -work work -O0 C:/Users/user/HSCD/Aufgabe3/insertcore.vhd
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 08:07:43 on Jan 16,2020
+# vcom -reportprogress 300 -work work -O0 C:/Users/user/HSCD/Aufgabe3/insertcore.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling entity insertcore
+# -- Compiling architecture verhalten of insertcore
+# End time: 08:07:43 on Jan 16,2020, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+add wave -position end  sim:/insertcore_tb/cnt
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: user  Hostname: VBOX-PC  ProcessID: 560
+#           Attempting to use alternate WLF file "./wlftiwarqv".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftiwarqv
+add wave -position end  sim:/insertcore_tb/clk
+add wave -position end  sim:/insertcore_tb/ram
+add wave -position end  sim:/insertcore_tb/asic/i
+add wave -position end  sim:/insertcore_tb/asic/j
+add wave -position end  sim:/insertcore_tb/asic/key
+add wave -position end  sim:/insertcore_tb/asic/DIB
+add wave -position end  sim:/insertcore_tb/asic/DOB
+add wave -position end  sim:/insertcore_tb/asic/ADR
+run -all
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+add wave -position end  sim:/insertcore_tb/strt
+add wave -position end  sim:/insertcore_tb/done
+restart
+# Loading work.insertcore(verhalten)
+run -all
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+vcom -reportprogress 300 -work work C:/Users/user/HSCD/Aufgabe3/testbench/insertcore_tb.vhd
+# Model Technology ModelSim Microsemi vcom 10.5c Compiler 2016.07 Jul 21 2016
+# Start time: 08:22:18 on Jan 16,2020
+# vcom -reportprogress 300 -work work C:/Users/user/HSCD/Aufgabe3/testbench/insertcore_tb.vhd 
+# -- Loading package STANDARD
+# -- Compiling entity insertcore_tb
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling architecture verhalten of insertcore_tb
+# End time: 08:22:27 on Jan 16,2020, Elapsed time: 0:00:09
+# Errors: 0, Warnings: 0
+restart
+# Loading work.insertcore_tb(verhalten)
+run -all
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 fs  Iteration: 0  Instance: /insertcore_tb/asic
